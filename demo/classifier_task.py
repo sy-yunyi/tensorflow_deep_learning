@@ -45,10 +45,12 @@ labelPlace = tf.placeholder(shape = [None], dtype = tf.float32, name= 'labelPlac
 
 
 # 参数
-W = tf.Variable(tf.random_normal(shape=[]),dtype = tf.float32,name='W')
+W1 = tf.Variable(tf.random_normal(shape=[]),dtype = tf.float32,name='W')
+W2 = tf.Variable(tf.random_normal(shape=[]),dtype = tf.float32,name='W')
+
 b = tf.Variable(tf.random_normal(shape=[]),dtype = tf.float32,name='b')
 
-pred = tf.add(tf.multiply(W, xPlace),b)
+pred = tf.add(tf.add(tf.multiply(W1, xPlace),tf.multiply(W2,yPlace)),b)
 # pred  = yPlace - yPred
 
 loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=labelPlace,logits=pred))
@@ -63,9 +65,12 @@ with tf.Session() as sess :
         sess.run(trainProcess,feed_dict={xPlace:trainXsample,yPlace:trainYsample,labelPlace:trainLabel})
         sess.run(loss, feed_dict={xPlace:trainXsample,yPlace:trainYsample,labelPlace:trainLabel})
         sess.run(loss, feed_dict={xPlace:testXsample,yPlace:testYsample,labelPlace:testLabel})
-    lastW = sess.run(W)
+    lastW1 = sess.run(W1)
+    lastW2 = sess.run(W2)
     lastb = sess.run(b)
     linex = np.linspace(-5,5,1000)
     # pdb.set_trace()
-    plt.plot(linex,(linex * lastW + lastb))
+
+
+    plt.plot(linex,(linex * lastW1 + lastb)/(-lastW2))
     plt.show()
