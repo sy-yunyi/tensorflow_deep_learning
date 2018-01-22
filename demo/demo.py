@@ -6,11 +6,11 @@ from PIL import PSDraw
 import numpy as np
 import matplotlib.pyplot as plt
 
-im = Image.open('test.jpg')
-# im.show()
-print(im.format,im.size,im.mode)
-im1 = im.convert('L')
-print(im1.format,im1.size,im1.mode)
+# im = Image.open('test.jpg')
+# # im.show()
+# print(im.format,im.size,im.mode)
+# im1 = im.convert('L')
+# print(im1.format,im1.size,im1.mode)
 # im1.show()
 # title = 'lena'
 # box = (1*72,2*72,7*72,10*72)
@@ -19,16 +19,13 @@ print(im1.format,im1.size,im1.mode)
 #
 # ps.image(box,im,75)
 # im.show()
-
-img = np.array(im)
-plt.figure('dog')
-plt.show(img)
-plt.axis('off')
-plt.show()
-
-
-
-
+# img = np.array(im)
+# plt.figure('dog')
+# plt.show(img)
+# plt.axis('off')
+# plt.show()
+#
+sess = tf.Session()
 
 
 
