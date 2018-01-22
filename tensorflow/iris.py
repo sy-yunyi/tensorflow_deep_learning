@@ -242,7 +242,6 @@ def classifiy(xSample, ySample, lableSample):
         # plt.plot(linex,-(linex * lastW[0][2]+ lastb[2])/lastW[1][2])
         plt.show()
 
-
 def classifiyThree(xSample,ySample,zSample,lableSample):
 
     #超参
