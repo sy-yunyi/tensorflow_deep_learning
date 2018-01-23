@@ -1,5 +1,6 @@
 from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
+import numpy as np
 
 mnist = input_data.read_data_sets('/path/to/MNIST_data',one_hot=True)
 
@@ -31,3 +32,5 @@ def train(mnist):
 
     weight2 = tf.Variable(tf.truncated_normal([LAYER1_NODE,OUTPUT_NODE],stddev = 0.1))
     biases2 = tf.Variable(tf.constant(0.1,shape=[OUTPUT_NODE]))
+
+np.round()
