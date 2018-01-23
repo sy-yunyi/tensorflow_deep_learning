@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+
 from mpl_toolkits.mplot3d import Axes3D
 import pdb
 def loadData(filePath):
@@ -13,11 +14,11 @@ def loadData(filePath):
     """
     data_file = pd.read_csv(filePath,header=None)
     xSample = data_file[2].values
-    ySample = data_file[3].values
+    ySample = data_file[1].values
     zSample = data_file[1].values
-    # lableSample = pd.get_dummies(data_file[4]).values
+    lableSample = pd.get_dummies(data_file[4]).values
     # lableSample =[0 if data =='Iris-setosa' else 1 if data == 'Iris-versicolor'  else 2 for data in  data_file[4].values]
-    lableSample =[0. if data =='Iris-setosa' else 1. for data in  data_file[4].values]
+    # lableSample =[0. if data =='Iris-setosa' else 1. for data in  data_file[4].values]
 
     return xSample,ySample,zSample,lableSample
 
@@ -145,7 +146,7 @@ def backPropagationThree(xSample,ySample,zSample):
     # 超参
     trainNum = 150
     trainPercent = 0.8
-    learningRate = 0.0002
+    learningRate = 2
     trainStep = 1000
 
     # 获取随机的下标
@@ -211,6 +212,17 @@ def classifiy(xSample, ySample, lableSample):
 
     X = np.column_stack((xSample,ySample))
 
+    index = [i for i in range(150)]
+    random.shuffle(index)
+    trainIndex = index[:100]
+    testIndex = index[100:]
+
+    trainSample = X[trainIndex]
+    trainLabel = lableSample[trainIndex]
+    testSample = X[testIndex]
+    testLabel = lableSample[testIndex]
+
+
     xPlace = tf.placeholder(shape=[None,2],dtype=tf.float32,name='xPlace')
     # yPlace = tf.placeholder(shape=[None],dtype=tf.float32,name='yPlace')
     lPlace = tf.placeholder(shape=[None,3],dtype=tf.float32,name='lPlace')
@@ -223,6 +235,8 @@ def classifiy(xSample, ySample, lableSample):
 
     loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred,labels=lPlace))
 
+    accur = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(tf.nn.softmax(pred),1),tf.argmax(pred,1)),tf.float32))
+
     myOpt = tf.train.GradientDescentOptimizer(learningRate)
     trainProcess = myOpt.minimize(loss,name='trainProcess')
 
@@ -230,17 +244,18 @@ def classifiy(xSample, ySample, lableSample):
     with tf.Session() as sess :
         sess.run(tf.global_variables_initializer())
         for i in range(trainNum):
-            sess.run(trainProcess,feed_dict={xPlace:X,lPlace:lableSample})
-        lastW = sess.run(W)
-        lastb = sess.run(b)
-        print(lastW)
-        print(lastb)
-
+            sess.run(trainProcess,feed_dict={xPlace:trainSample,lPlace:trainLabel})
+            ac = sess.run(accur,feed_dict={xPlace:testSample,lPlace:testLabel})
+        # lastW = sess.run(W)
+        # lastb = sess.run(b)
+            print(ac)
+        # print(lastW)
+        # print(lastb)
         linex = np.linspace(0,5,1000)
-        plt.plot(linex,-(linex * lastW[0][0] + lastb[0])/lastW[1][0])
-        plt.plot(linex,-(linex * lastW[0][1]+ lastb[1])/lastW[1][1])
+        # plt.plot(linex,-(linex * lastW[0][0] + lastb[0])/lastW[1][0])
+        # plt.plot(linex,-(linex * lastW[0][1]+ lastb[1])/lastW[1][1])
         # plt.plot(linex,-(linex * lastW[0][2]+ lastb[2])/lastW[1][2])
-        plt.show()
+        # plt.show()
 
 def classifiyThree(xSample,ySample,zSample,lableSample):
 
@@ -268,7 +283,7 @@ def classifiyThree(xSample,ySample,zSample,lableSample):
 
     myOpt = tf.train.GradientDescentOptimizer(learningRate)
     trainProcess = myOpt.minimize(loss,name='trainProcess')
-    tf.nn.batch_normalization()
+    # tf.nn.batch_normalization()
 
     losses = []
 
@@ -283,14 +298,80 @@ def classifiyThree(xSample,ySample,zSample,lableSample):
         y = (w[0] * linex +w[3]) /(-w[1])
         x, y = np.meshgrid(linex, y)
         z = (w[0] * x +w[1] * y +w[3])/(-w[2])
-        print(z)
+        # print(z)
         ax.plot_surface(x,y,z)
+        tf.nn.conv2d()
         plt.legend()
         plt.show()
 
+
+def classifiy2(xSample,ySample,labelSample):
+
+    # 超参
+    sampleNum = len(labelSample)
+    trainStep = 1000
+    learningRate = 2
+    trainPercent = 1.
+    labelSample = np.array(labelSample)
+    # xSample = np.array(xSample)
+    # ySample = np.array(ySample)
+    # pdb.set_trace()
+
+    plt.scatter(xSample[labelSample==0],ySample[labelSample==0])
+    plt.scatter(xSample[labelSample==1],ySample[labelSample==1])
+    plt.scatter(xSample[labelSample==2],ySample[labelSample==2])
+    # plt.show()
+
+
+    trainSample = np.column_stack((xSample,ySample))
+    # define placeholder
+    xPlace = tf.placeholder(shape=[None, 2], dtype=tf.float32)
+    labelPlace = tf.placeholder(shape=[None, 1], dtype=tf.float32)
+
+    # 参数
+    W = tf.Variable(tf.random_normal(shape=[2, 1]))
+    b = tf.Variable(tf.random_normal(shape=[]))
+
+    # 假设公式, 注意是矩阵运算
+    pred = tf.add(tf.matmul(xPlace, W), b)
+
+    # define loss
+    loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=pred,
+                                                                  labels=labelPlace))
+    # 训练过程
+    trainProcess = tf.train.AdamOptimizer(learningRate). \
+        minimize(tf.reduce_mean(loss))
+
+    # 准确率
+    accur = tf.reduce_mean(tf.cast(tf.equal(tf.round(tf.nn.sigmoid(pred)), labelPlace), tf.float32))
+
+    # 开始训练
+    lossesTrain = []
+    lossesTest = []
+    accurs = []
+
+    for i in [0., 1., 2.]:
+        current_trainLabelsample = np.array([1. if item == i else 0. for item in labelSample]).reshape([-1, 1])
+        # print(trainLabelsample.shape)
+        with tf.Session() as sess:
+            sess.run(tf.global_variables_initializer())
+            # print(sess.run([W, b]))
+            for step in range(trainStep):
+                sess.run(trainProcess, feed_dict={
+                    xPlace: trainSample, labelPlace: current_trainLabelsample
+                })
+            lastW, lastb = sess.run([W, b])
+            # print(sess.run([W, b]))
+            x = np.linspace(start=-2, stop=10, num=100)
+            plt.plot(x, (-1) * ((lastW[0][0] * x + lastb) / lastW[1][0]), '-',label = i)
+    # plt.ylim(-5, 15)
+    plt.legend()
+    plt.show()
+
+
 if __name__ == '__main__':
     filePath = './data/iris'
-    x, y, z, lables =loadData(filePath)
+    x, y, z, labels =loadData(filePath)
     # 两特征拟合
     # backPropagation(x,y)
     # 最小二乘法拟合
@@ -300,7 +381,9 @@ if __name__ == '__main__':
     # 三特征拟合
     # backPropagationThree(x, y, z)
     #平面分三类
-    # classifiy(x,y,lables)
-    classifiyThree(x,y,z,lables)
+    # classifiy2(x,y,labels)
+
+    # classifiyThree(x,y,z,lables)
+    classifiy(x,y,labels)
 
 
