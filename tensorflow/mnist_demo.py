@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pdb
 
 
-mnist = input_data.read_data_sets('G:/mnist',one_hot=True)
+mnist = input_data.read_data_sets(r'C:\Users\Administrator\Desktop\深度学习\code\SampleData\Mnist',one_hot=True)
 
 # print(mnist.train.images.shape)
 # print(mnist.train.labels[:20,:])
@@ -44,7 +44,7 @@ mnist = input_data.read_data_sets('G:/mnist',one_hot=True)
 
 
 def loadImg():
-    im = Image.open('./data/1.png')
+    im = Image.open('./data/0.png')
     im = im.resize((28,28)).convert('L')
     # im.show()
     # print(im.format, im.size, im.mode)
@@ -218,11 +218,11 @@ def predClassifiy(img):
 if __name__ == '__main__':
     img = loadImg()
     # 训练 one_hot
-    mnistClassifiy(mnist)
+    # mnistClassifiy(mnist)
 
     #进行训练，非one_hot
     # mnistClassifiy2(mnist,img)
     # 预测
     # predClassifiy(img)
-    # mnistPred(img)
+    mnistPred(img)
 
