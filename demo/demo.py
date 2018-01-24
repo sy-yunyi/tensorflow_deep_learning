@@ -6,6 +6,16 @@ from PIL import PSDraw
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+
+sess = tf.Session()
+input = tf.Variable(tf.random_normal([1,5,5,5]))
+filter = tf.Variable(tf.random_normal([3,3,5,1]))
+sess.run(tf.global_variables_initializer())
+op = tf.nn.conv2d(input, filter, strides=[1, 1, 1, 1], padding='SAME')
+print(sess.run(op).shape)
+
+
 # im = Image.open('test.jpg')
 # # im.show()
 # print(im.format,im.size,im.mode)
@@ -24,34 +34,7 @@ import matplotlib.pyplot as plt
 # plt.show(img)
 # plt.axis('off')
 # plt.show()
-#
-sess = tf.Session()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#
 # g1 = tf.Graph()
 # with g1.as_default():
 #     v = tf.get_variable('v',shape=[1],initializer=tf.zeros_initializer())
