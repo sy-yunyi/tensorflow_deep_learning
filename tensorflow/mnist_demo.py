@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pdb
 
 
-mnist = input_data.read_data_sets(r'C:\Users\Administrator\Desktop\深度学习\code\SampleData\Mnist',one_hot=True)
+mnist = input_data.read_data_sets(r'C:\Users\Administrator\Desktop\deeplearning\code\SampleData\Mnist',one_hot=True)
 
 # print(mnist.train.images.shape)
 # print(mnist.train.labels[:20,:])
@@ -44,7 +44,7 @@ mnist = input_data.read_data_sets(r'C:\Users\Administrator\Desktop\深度学习\
 
 
 def loadImg():
-    im = Image.open('./data/0.png')
+    im = Image.open('./data/image/7-5.png')
     im = im.resize((28,28)).convert('L')
     # im.show()
     # print(im.format, im.size, im.mode)
@@ -57,7 +57,7 @@ def loadImg():
     # print(np.cast(img))
     # norm_img = (img-img.min(0))/(img.max(0) - img.min(0))
     # print(norm_img)
-    return np.array(img).reshape(1,-1)
+    return np.array(img,dtype=np.float32).reshape(1,-1)
 
 
 def mnistClassifiy(mnist):
@@ -65,7 +65,7 @@ def mnistClassifiy(mnist):
     trainStep = 50
     learningRate = 1
     trainNum = mnist.train.num_examples
-    batch_size = 11000
+    batch_size = 100
 
     xPlace = tf.placeholder(shape=[None,784],dtype=tf.float32,name='xPlace')
     labelPlace = tf.placeholder(shape=[None,10],dtype=tf.float32,name='labelPlace')
@@ -75,7 +75,7 @@ def mnistClassifiy(mnist):
 
     b = tf.Variable(tf.random_normal(shape=[]),dtype=tf.float32,name='b')
 
-    pred =tf.add(tf.matmul(xPlace,W),b)
+    pred =tf.add(tf.matmul(xPlace,W),b,name='pred')
 
     loss = tf.nn.softmax_cross_entropy_with_logits(labels=labelPlace,logits=pred)
 
@@ -104,12 +104,12 @@ def mnistClassifiy(mnist):
         print(lastb)
         # print(vect)
 
-
 def mnistClassifiy2(mnist,img =None):
-    trainStep = 200
+    trainStep = 1000
     learningRate = 0.0002
     trainNum = mnist.train.num_examples
     hideNode = 200
+    print(mnist.train.labels)
     xPlace = tf.placeholder(shape=[None, 784], dtype=tf.float32, name='xPlace')
     labelPlace = tf.placeholder(shape=[None], dtype=tf.int64, name='labelPlace')
 
@@ -121,8 +121,8 @@ def mnistClassifiy2(mnist,img =None):
     b2 = tf.Variable(tf.random_normal(shape=[1]), dtype=tf.float32, name='b2')
 
     hidePred =tf.nn.tanh(tf.add(tf.matmul(xPlace, W), b))
-    pred = tf.add(tf.matmul(hidePred,W1),b2)
-
+    pred = tf.add(tf.matmul(hidePred,W1),b2,name='pred')
+    print(pred)
 
     # print(pred.shape)
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labelPlace, logits=pred)
@@ -148,68 +148,38 @@ def mnistClassifiy2(mnist,img =None):
         saver = tf.train.Saver()
         saver_path = saver.save(sess,'./model/model')
         lastW, lastb2 = sess.run([W,b2])
-        pred1 = sess.run(pred,feed_dict={xPlace:img})
+        # pred1 = sess.run(pred,feed_dict={xPlace:img})
         print(lastb2)
-        print(pred1)
-        pdb.set_trace()
-        print(tf.argmax(pred1,1).eval())
+        # print(pred1)
+        # pdb.set_trace()
+        # print(tf.argmax(pred1,1).eval())
 
 def mnistPred(img):
+
     sess = tf.Session()
     graph = tf.get_default_graph()
 
     saver = tf.train.import_meta_graph('./model/model.meta')
-    # xPlace = tf.placeholder(shape=[None, 784], dtype=tf.float32, name='xPlace')
-    # labelPlace = tf.placeholder(shape=[None, 10], dtype=tf.float32, name='labelPlace')
-    #
-    # W = tf.Variable(tf.random_normal(shape=[784, 10]), dtype=tf.float32, name='W')
-    # b = tf.Variable(tf.random_normal(shape=[]), dtype=tf.float32, name='b')
-    xPlace = tf.convert_to_tensor(img,dtype=tf.float32)
-    # sess.run(tf.global_variables_initializer())
     saver.restore(sess,tf.train.latest_checkpoint('model/'))
 
-    A = graph.get_tensor_by_name('W:0')
-    B = graph.get_tensor_by_name('b:0')
-    pred =tf.add(tf.matmul(xPlace, A), B)
+    xPlace = graph.get_tensor_by_name('xPlace:0')
+    pred =graph.get_tensor_by_name('pred:0')
 
-    # print(sess.run(b))
-    # pred1 = sess.run(pred, feed_dict={xPlace: img})
-    print(pred.eval(session=sess)[0])
-    print('预测值为：', np.argmax(pred.eval(session=sess)[0]))
+    pred1 = sess.run(pred, feed_dict={xPlace: img})
+    print('预测值为：', np.argmax(pred1[0]))
 
 def predClassifiy(img):
     hideNode = 100
     graph = tf.get_default_graph()
-    # W = tf.Variable(tf.random_normal(shape=[784, 10]), dtype=tf.float32, name='W')
-    # b = tf.Variable(tf.random_normal(shape=[]), dtype=tf.float32, name='b')
-    # saver = tf.train.Saver()
     saver = tf.train.import_meta_graph('./model/model.meta')
-    xPlace = tf.placeholder(shape=[None, 784], dtype=tf.float32, name='xPlace')
-    W = tf.Variable(tf.random_normal(shape=[784, hideNode]), dtype=tf.float32, name='W')
 
-    W1 = tf.Variable(tf.random_normal(shape=[hideNode, 10]), dtype=tf.float32, name='W1')
-
-    b = tf.Variable(tf.random_normal(shape=[hideNode]), dtype=tf.float32, name='b')
-    b2 = tf.Variable(tf.random_normal(shape=[1]), dtype=tf.float32, name='b2')
-
-    hidePred = tf.nn.tanh(tf.add(tf.matmul(xPlace, W), b))
-    pred = tf.add(tf.matmul(hidePred, W1), b2)
     with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())
         saver.restore(sess,tf.train.latest_checkpoint('model/'))
 
-        W = W.assign(graph.get_tensor_by_name('W:0'))
-        b = b.assign(graph.get_tensor_by_name('b:0'))
-        # pdb.set_trace()
-        W1 = W1.assign(graph.get_tensor_by_name('W1:0'))
-        b2 = b2.assign(graph.get_tensor_by_name('b2:0'))
 
-        # W1 = sess.run(W)
-        b1 = sess.run(b2)
-        print(b1)
-        pred1 = sess.run(pred,feed_dict={xPlace:img})
+        # pred1 = sess.run(pred,feed_dict={xPlace:img})
         # pdb.set_trace()
-        print('预测值为：',tf.argmax(pred1,1).eval()[0])
+        # print('预测值为：',tf.argmax(pred1,1).eval()[0])
 
 
 
@@ -218,11 +188,12 @@ def predClassifiy(img):
 if __name__ == '__main__':
     img = loadImg()
     # 训练 one_hot
-    # mnistClassifiy(mnist)
+    mnistClassifiy(mnist)
 
     #进行训练，非one_hot
     # mnistClassifiy2(mnist,img)
     # 预测
     # predClassifiy(img)
-    mnistPred(img)
+    # print(img.shape)
+    # mnistPred(img)
 
