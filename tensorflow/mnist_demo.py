@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pdb
 
 
-mnist = input_data.read_data_sets(r'C:\Users\Administrator\Desktop\deeplearning\code\SampleData\Mnist',one_hot=True)
+mnist = input_data.read_data_sets(r'C:\Users\Administrator\Desktop\deeplearning\code\SampleData\Mnist',one_hot=False)
 
 # print(mnist.train.images.shape)
 # print(mnist.train.labels[:20,:])
@@ -106,10 +106,11 @@ def mnistClassifiy(mnist):
 
 def mnistClassifiy2(mnist,img =None):
     trainStep = 1000
-    learningRate = 0.0002
+    learningRate = 0.1
     trainNum = mnist.train.num_examples
     hideNode = 200
-    print(mnist.train.labels)
+    batch_size = 2500
+    # print(mnist.train.labels)
     xPlace = tf.placeholder(shape=[None, 784], dtype=tf.float32, name='xPlace')
     labelPlace = tf.placeholder(shape=[None], dtype=tf.int64, name='labelPlace')
 
@@ -122,7 +123,7 @@ def mnistClassifiy2(mnist,img =None):
 
     hidePred =tf.nn.tanh(tf.add(tf.matmul(xPlace, W), b))
     pred = tf.add(tf.matmul(hidePred,W1),b2,name='pred')
-    print(pred)
+    # print(pred)
 
     # print(pred.shape)
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labelPlace, logits=pred)
@@ -132,7 +133,7 @@ def mnistClassifiy2(mnist,img =None):
     accur = tf.reduce_mean(
         tf.cast(tf.equal(tf.argmax(tf.nn.softmax(logits=pred), axis=1), labelPlace), tf.float32))
 
-    my_opt = tf.train.GradientDescentOptimizer(learningRate)
+    my_opt = tf.train.AdamOptimizer(learningRate)
     trainProcess = my_opt.minimize(loss, name='trainProcess')
 
     losses = []
@@ -140,9 +141,13 @@ def mnistClassifiy2(mnist,img =None):
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         for i in range(trainStep):
-            sess.run(trainProcess, feed_dict={xPlace: mnist.train.images, labelPlace: mnist.train.labels})
-            sess.run(trainProcess, feed_dict={xPlace: mnist.test.images, labelPlace: mnist.test.labels})
-            if (i%100 ==0):
+            batch_num = int(trainNum / batch_size)
+            # print(batch_num)
+            for j in range(batch_num):
+                batch_xs,batch_ys = mnist.train.next_batch(batch_size)
+                sess.run(trainProcess, feed_dict={xPlace: batch_xs, labelPlace: batch_ys})
+                # sess.run(trainProcess, feed_dict={xPlace: mnist.test.images, labelPlace: mnist.test.labels})
+            # if (i%100 ==0):
                 accues = sess.run(accur, feed_dict={xPlace: mnist.test.images, labelPlace: mnist.test.labels})
                 print('第 %d 次循环的正确率是：%0.6f%%' % (i + 1, accues * 100))
         saver = tf.train.Saver()
@@ -188,10 +193,10 @@ def predClassifiy(img):
 if __name__ == '__main__':
     img = loadImg()
     # 训练 one_hot
-    mnistClassifiy(mnist)
+    # mnistClassifiy(mnist)
 
     #进行训练，非one_hot
-    # mnistClassifiy2(mnist,img)
+    mnistClassifiy2(mnist,img)
     # 预测
     # predClassifiy(img)
     # print(img.shape)
