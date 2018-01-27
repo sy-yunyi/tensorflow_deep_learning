@@ -11,9 +11,9 @@ test_data = np.array([np.reshape(x,(28,28)) for x in mnist.test.images])
 train_labels = mnist.train.labels
 test_labels = mnist.test.labels
 
-batch_size = 100
-learning_rate = 0.005
-evaluation_size = 500
+batch_size = 1000
+learning_rate = 0.001
+evaluation_size = 10000
 image_width = train_xdata[0].shape[0]
 image_height = train_xdata[0].shape[1]
 target_size = max(train_labels) + 1
@@ -24,7 +24,7 @@ conv1_features = 25
 conv2_features = 50
 max_pool_size1 = 2
 max_pool_size2 = 2
-fully_connected_size1 = 100
+fully_connected_size1 = 784
 # pdb.set_trace()
 x_input_shape = (batch_size,image_width,image_height,num_channels)
 x_input = tf.placeholder(shape=x_input_shape,dtype=tf.float32,name='x_input')
@@ -76,7 +76,7 @@ def get_accuracy(logits,targets):
     num_correct = np.sum(np.equal(batch_predictions,targets))
     return (100 * num_correct / batch_predictions.shape[0])
 
-my_opt = tf.train.MomentumOptimizer(learning_rate,0.9)
+my_opt = tf.train.AdamOptimizer(learning_rate)
 train_step = my_opt.minimize(loss,name='train_step')
 
 sess.run(tf.global_variables_initializer())
