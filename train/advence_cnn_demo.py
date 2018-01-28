@@ -41,7 +41,6 @@ data_file = os.path.join(data_dir,'cifar-10-binary.tar.gz')
 # if not os.path.isfile(data_file):
     # filepath,_ = urllib.request.urlretrieve(cifar10_url,data_file)
 # tarfile.open('./temp/cifar-10-binary.tar.gz','r:gz').extractall(data_dir)
-print('************')
 def read_cifar_files(filename_queue,distort_image = True):
     reader = tf.FixedLengthRecordReader(record_bytes=record_length)
     key, record_string = reader.read(filename_queue)
