@@ -65,7 +65,7 @@ def input_pipeline(batch_size,train_logical = True):
     filename_queue = tf.train.string_input_producer(files)
     image, label = read_cifar_files(filename_queue)
     min_after_dequeue = 1000
-    capacity = min_after_dequeue +3*batch_size
+    capacity = min_after_dequeue + 3 * batch_size
     example_batch,label_batch = tf.train.shuffle_batch([image,label],batch_size,capacity,min_after_dequeue)
     return (example_batch,label_batch)
 

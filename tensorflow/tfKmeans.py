@@ -109,10 +109,15 @@ def imgDispose(url=None):
     :return:
     """
     # request.urlretrieve('http://www.jiningsoftware.com/public/upload/images/2018-01-22/5a659b9686340.jpg','./data/demo.jpg')
-    img = Image.open('./data/demo.jpg')
-    img = img.resize((200, 200))
+    img = Image.open('./data/image/demo.jpg')
+    # img = img.resize((200, 200))
+    # print(img.format)
+    im = np.array(img)
+    print(im.shape)
+    # plt.imshow(im.reshape(657, 1920, 3))
+    # plt.show()
     # print(img.size)
-    img.show()
+    # img.show()
     imgGray = img.convert('L')
     # imgGray.show()
     # 旋转90度
@@ -145,13 +150,13 @@ def imgDispose(url=None):
     enh_sha = ImageEnhance.Sharpness(img)
     sharpness = 3.0
     image_sharped = enh_sha.enhance(sharpness)
-    image_sharped.show()
+    # image_sharped.show()
 
     # 图片色度
     enh_col = ImageEnhance.Color(img)
     color = 1.5
     image_colored = enh_col.enhance(color)
-    image_colored.show()
+    # image_colored.show()
 
 
 def loadDataCsv():
@@ -257,11 +262,11 @@ if __name__ == '__main__':
     sample = loadData('./data/iris')
     #task1
     # kmeans
-    tfKmeans(sample,2)
+    # tfKmeans(sample,2)
     #task2
     # 图片处理
-    # imgDispose()
-    sample , label = loadDataCsv()
+    imgDispose()
+    # sample , label = loadDataCsv()
     # print(type(sample))
     #task3
     # wineWhite(sample,label)
