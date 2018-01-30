@@ -90,7 +90,7 @@ def cifar_cnn_model(input_images,batch_size,train_logical = True):
         conv2_bias = zero_var(name='conv2_bias', shape=[64],dtype=tf.float32)
         conv2_add_bias = tf.nn.bias_add(conv2,conv2_bias)
         relu2 = tf.nn.relu(conv2_add_bias)
-    pool2 = tf.nn.max_pool(conv2_add_bias,ksize=[1,3,3,1],strides=[1,2,2,1],padding='SAME',name='pool2_layer')
+    pool2 = tf.nn.max_pool(relu2,ksize=[1,3,3,1],strides=[1,2,2,1],padding='SAME',name='pool2_layer')
     norm2 = tf.nn.lrn(pool2,depth_radius=5,bias=2.0,alpha=1e-3,beta=0.75,name='norm2')
     reshaped_output = tf.reshape(norm2,[batch_size,-1])
     reshaped_dim = reshaped_output.get_shape()[1].value
