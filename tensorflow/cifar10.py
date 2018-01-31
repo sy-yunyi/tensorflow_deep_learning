@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 
 #超参
-train_step = 20000
+train_step = 100000
 learning_rate = 0.00003
 # num_sample = len(x)
 image_width = 32

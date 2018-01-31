@@ -113,7 +113,10 @@ def imgDispose(url=None):
     # img = img.resize((200, 200))
     # print(img.format)
     im = np.array(img)
+
     print(im.shape)
+    plt.imshow(im)
+    plt.show()
     # plt.imshow(im.reshape(657, 1920, 3))
     # plt.show()
     # print(img.size)
